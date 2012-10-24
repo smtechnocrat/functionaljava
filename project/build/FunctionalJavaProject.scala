@@ -13,6 +13,9 @@ abstract class FunctionalJavaDefaults(info: ProjectInfo) extends DefaultProject(
 
   override def testFrameworks = Seq(new TestFramework("org.scalacheck.ScalaCheckFramework"))
 
+  override def version = OpaqueVersion(super.version + system[String]("build.publish.version").get.map(ver => "." + ver).getOrElse(""))
+
+  override def repositories = Set("OurNexus" at system[String]("build.repo.url").get.getOrElse("") + "/groups/public")
   override protected def disableCrossPaths = true
 
   override def packageSrcJar = defaultJarPath("-sources.jar")
@@ -53,10 +56,7 @@ import org.scalacheck.Prop._
   val pubishToRepoName = "Sonatype Nexus Repository Manager"
 
   val publishTo = {
-    val repoUrl = "http://nexus.scala-tools.org/content/repositories/" + (if (version.toString.endsWith("-SNAPSHOT"))
-      "snapshots"
-    else
-      "releases")
+    val repoUrl =  system[String]("build.repo.url").get.getOrElse("") + "/repositories/yd-release-candidates"
 
     pubishToRepoName at repoUrl
   }
@@ -66,7 +66,7 @@ import org.scalacheck.Prop._
 
   (publishUser.get, publishPassword.get) match {
     case (Some(u), Some(p)) =>
-      Credentials.add(pubishToRepoName, "nexus.scala-tools.org", u, p)
+      Credentials.add(pubishToRepoName, "repo", u, p)
     case _ =>
       Credentials(Path.userHome / ".ivy2" / ".credentials", log)
   }
