@@ -616,9 +616,6 @@ public abstract class Option<A> implements Iterable<A> {
     private final A a;
 
     Some(final A a) {
-      if (a == null) {
-        throw new NullPointerException("Some cannot be null");
-      }
       this.a = a;
     }
 
